@@ -42,6 +42,16 @@ export default function Reservas() {
     } catch { setAlerta({ msg: 'Error al cancelar', tipo: 'error' }) }
   }
 
+  const imagenServicio = (nombre) => {
+    if (nombre.includes('Bodas')) return 'https://images.unsplash.com/photo-1606800052052-a08af7148866?q=80&w=2070'
+    if (nombre.includes('Cumpleaños')) return 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=2070'
+    if (nombre.includes('Eventos')) return 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070'
+    if (nombre.includes('Cenas')) return 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2070'
+    if (nombre.includes('Banquetes')) return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070'
+    if (nombre.includes('Fotográficas')) return 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2069'
+    return 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2070'
+  }
+
   return (
     <div className="min-h-screen bg-[#0D0D0D] flex">
       {/* Sidebar */}
@@ -69,8 +79,9 @@ export default function Reservas() {
         ) : (
           <div className="space-y-4">
             {reservas.map(r => (
-              <div key={r.id_reserva} className="bg-[#181818] border border-[#2A2A2A] p-5 flex items-center justify-between">
-                <div>
+              <div key={r.id_reserva} className="bg-[#181818] border border-[#2A2A2A] p-5 flex items-center gap-5">
+                <img src={imagenServicio(r.nombre_servicio)} alt={r.nombre_servicio} className="w-20 h-20 object-cover" />
+                <div className="flex-1">
                   <h3 className="text-[#F5F1E8] text-sm">{r.nombre_servicio}</h3>
                   <p className="text-[#A7A29A] text-xs">{r.fecha} · ${Number(r.precio).toFixed(2)}</p>
                 </div>
