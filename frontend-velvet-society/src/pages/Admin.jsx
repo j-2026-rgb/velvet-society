@@ -12,9 +12,9 @@ export default function Admin() {
   const cargarTodo = async () => {
     try {
       const [s, c, r] = await Promise.all([
-        fetch('https://backend-velvet-society.onrender.com/api/servicios/todos').then(r => r.json()),
-        fetch('https://backend-velvet-society.onrender.com/api/clientes').then(r => r.json()),
-        fetch('https://backend-velvet-society.onrender.com/api/reservas').then(r => r.json())
+        fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/servicios/todos').then(r => r.json()),
+        fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/clientes').then(r => r.json()),
+        fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/reservas').then(r => r.json())
       ])
       setServicios(s); setClientes(c); setReservas(r)
     } catch { console.error('Error cargando datos') }
@@ -22,7 +22,7 @@ export default function Admin() {
 
   const crearServicio = async (e) => {
     e.preventDefault()
-    const res = await fetch('https://backend-velvet-society.onrender.com/api/servicios', {
+    const res = await fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/servicios', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form)
     })
     const data = await res.json()
@@ -31,14 +31,14 @@ export default function Admin() {
   }
 
   const cambiarEstadoServicio = async (id, estado) => {
-    await fetch(`https://backend-velvet-society.onrender.com/api/servicios/${id}`, {
+    await fetch(`https://velvet-society-backend-velvet-socie.vercel.app/api/servicios/${id}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado })
     })
     cargarTodo()
   }
 
   const actualizarReserva = async (id, estado) => {
-    await fetch(`https://backend-velvet-society.onrender.com/api/reservas/${id}/estado`, {
+    await fetch(`https://velvet-society-backend-velvet-socie.vercel.app/api/reservas/${id}/estado`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ estado })
     })
     cargarTodo()

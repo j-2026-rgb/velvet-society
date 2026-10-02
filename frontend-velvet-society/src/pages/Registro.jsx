@@ -11,7 +11,7 @@ export default function Registro() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch('https://backend-velvet-society.onrender.com/api/auth/registro', {
+      const res = await fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/auth/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)

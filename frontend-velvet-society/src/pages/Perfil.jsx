@@ -7,14 +7,14 @@ export default function Perfil() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetch('https://backend-velvet-society.onrender.com/api/usuarios/perfil', { credentials: 'include' })
+    fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/usuarios/perfil', { credentials: 'include' })
       .then(res => res.json())
       .then(data => { if (data.error) setAlerta(data.error); else setPerfil(data) })
       .catch(() => setAlerta('Error al cargar perfil'))
   }, [])
 
   const handleLogout = async () => {
-    await fetch('https://backend-velvet-society.onrender.com/api/auth/logout', { method: 'POST', credentials: 'include' })
+    await fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/auth/logout', { method: 'POST', credentials: 'include' })
     navigate('/login')
   }
 

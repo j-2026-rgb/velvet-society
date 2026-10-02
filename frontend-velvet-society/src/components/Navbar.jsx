@@ -5,7 +5,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch('https://backend-velvet-society.onrender.com/api/auth/logout', { method: 'POST' })
+      const res = await fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/auth/logout', { method: 'POST' })
       if (res.ok) navigate('/login')
     } catch {
       navigate('/login')

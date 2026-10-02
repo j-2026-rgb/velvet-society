@@ -6,7 +6,7 @@ export default function Servicios() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('https://backend-velvet-society.onrender.com/api/servicios')
+    fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/servicios')
       .then(res => res.json())
       .then(data => { setServicios(data); setLoading(false) })
       .catch(() => setLoading(false))

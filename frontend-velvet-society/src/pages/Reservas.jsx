@@ -7,13 +7,13 @@ export default function Reservas() {
   const [alerta, setAlerta] = useState({ msg: '', tipo: '' })
 
   useEffect(() => {
-    fetch('https://backend-velvet-society.onrender.com/api/servicios').then(r => r.json()).then(setServicios)
+    fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/servicios').then(r => r.json()).then(setServicios)
     cargarReservas()
   }, [])
 
   const cargarReservas = async () => {
     try {
-      const res = await fetch('https://backend-velvet-society.onrender.com/api/reservas/mis-reservas', { credentials: 'include' })
+      const res = await fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/reservas/mis-reservas', { credentials: 'include' })
       if (res.status === 401) { setReservas([]); return }
       setReservas(await res.json())
     } catch { setReservas([]) }
@@ -22,7 +22,7 @@ export default function Reservas() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch('https://backend-velvet-society.onrender.com/api/reservas', {
+      const res = await fetch('https://velvet-society-backend-velvet-socie.vercel.app/api/reservas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -37,7 +37,7 @@ export default function Reservas() {
   const cancelarReserva = async (id) => {
     if (!window.confirm('¿Cancelar esta reserva?')) return
     try {
-      const res = await fetch(`https://backend-velvet-society.onrender.com/api/reservas/${id}/cancelar`, { method: 'PUT', credentials: 'include' })
+      const res = await fetch(`https://velvet-society-backend-velvet-socie.vercel.app/api/reservas/${id}/cancelar`, { method: 'PUT', credentials: 'include' })
       if (res.ok) { setAlerta({ msg: 'Reserva cancelada', tipo: 'success' }); cargarReservas() }
     } catch { setAlerta({ msg: 'Error al cancelar', tipo: 'error' }) }
   }
