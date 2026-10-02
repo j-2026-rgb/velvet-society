@@ -1,16 +1,53 @@
-# React + Vite
+# VELVET SOCIETY - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> "Donde la exclusividad se convierte en experiencia"
 
-Currently, two official plugins are available:
+Frontend de la plataforma Velvet Society.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tecnologías
 
-## React Compiler
+- **HTML5**
+- **CSS3**
+- **JavaScript**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Estructura
 
-## Expanding the ESLint configuration
+```
+frontend-velvet-society/
+│
+├── public/
+│   ├── index.html
+│   ├── login.html
+│   ├── registro.html
+│   ├── servicios.html
+│   ├── reservas.html
+│   ├── perfil.html
+│   ├── admin.html
+│   │
+│   ├── css/
+│   │   └── styles.css
+│   │
+│   └── js/
+│       ├── config.js
+│       ├── app.js
+│       ├── auth.js
+│       ├── servicios.js
+│       ├── reservas.js
+│       └── admin.js
+│
+├── .env.production
+├── .gitignore
+└── README.md
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Despliegue en Vercel
+
+1. Importa este repositorio en Vercel
+2. Configura la variable de entorno `API_URL` con la URL del backend
+3. Despliega
+
+## Variables de Entorno
+
+| Variable | Descripción |
+|----------|-------------|
+| `API_URL` | URL del backend (ej: `https://velvet-society-api.vercel.app`) |
