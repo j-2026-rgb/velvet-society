@@ -8,7 +8,8 @@ const DB_CONFIG = {
     password: process.env.MYSQL_ADDON_PASSWORD || 'tRLMfMu35KYGXAhfOzVY',
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    multipleStatements: true
 };
 
 let pool = null;
