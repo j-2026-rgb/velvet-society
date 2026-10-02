@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const { initializeDatabase } = require('./server/database/connection');
@@ -11,8 +12,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Archivos estáticos
-app.use(express.static(path.join(__dirname, 'public')));
+// CORS - permitir solicitudes desde cualquier origen (Vercel)
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 
 // Inicializar base de datos
 initializeDatabase();
