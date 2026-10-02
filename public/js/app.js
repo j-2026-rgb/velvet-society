@@ -5,7 +5,7 @@
 // Verificar sesión al cargar la página
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        const response = await fetch('/api/auth/sesion');
+        const response = await fetch(getApiUrl('/auth/sesion'));
         const data = await response.json();
 
         if (data.autenticado) {
@@ -39,7 +39,7 @@ function actualizarNavegacion(usuario) {
 
 async function cargarPerfil(usuario) {
     try {
-        const response = await fetch('/api/usuarios/perfil');
+        const response = await fetch(getApiUrl('/usuarios/perfil'));
         const perfil = await response.json();
 
         const container = document.getElementById('perfilContainer');
@@ -58,7 +58,7 @@ async function cargarPerfil(usuario) {
 
 async function cerrarSesion() {
     try {
-        await fetch('/api/auth/logout', { method: 'POST' });
+        await fetch(getApiUrl('/auth/logout'), { method: 'POST' });
         window.location.href = '/';
     } catch (error) {
         console.error('Error al cerrar sesión:', error);

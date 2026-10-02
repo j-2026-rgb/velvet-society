@@ -12,7 +12,7 @@ if (loginForm) {
         const contraseña = document.getElementById('contraseña').value;
 
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch(getApiUrl('/auth/login'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ correo, contraseña })
@@ -47,7 +47,7 @@ if (registroForm) {
         const direccion = document.getElementById('direccion').value;
 
         try {
-            const response = await fetch('/api/auth/registro', {
+            const response = await fetch(getApiUrl('/auth/registro'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nombre, correo, contraseña, telefono, direccion })

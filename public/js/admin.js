@@ -20,7 +20,7 @@ async function cargarServicios() {
     const container = document.getElementById('serviciosContainer');
 
     try {
-        const response = await fetch('/api/servicios/todos');
+        const response = await fetch(getApiUrl('/servicios/todos'));
         const servicios = await response.json();
 
         container.innerHTML = `
@@ -65,7 +65,7 @@ async function crearServicio(e) {
     const precio = parseFloat(document.getElementById('precioServicio').value);
 
     try {
-        const response = await fetch('/api/servicios', {
+        const response = await fetch(getApiUrl('/servicios'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nombre, descripcion, precio })
@@ -87,7 +87,7 @@ async function crearServicio(e) {
 
 async function desactivarServicio(id) {
     try {
-        const response = await fetch(`/api/servicios/${id}`, { method: 'DELETE' });
+        const response = await fetch(getApiUrl(`/servicios/${id}`), { method: 'DELETE' });
         if (response.ok) {
             mostrarAlerta('Servicio desactivado', 'success');
             cargarServicios();
@@ -99,7 +99,7 @@ async function desactivarServicio(id) {
 
 async function activarServicio(id) {
     try {
-        const response = await fetch(`/api/servicios/${id}`, {
+        const response = await fetch(getApiUrl(`/servicios/${id}`), {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ estado: 'activo' })
@@ -120,7 +120,7 @@ async function cargarClientes() {
     const container = document.getElementById('clientesContainer');
 
     try {
-        const response = await fetch('/api/clientes');
+        const response = await fetch(getApiUrl('/clientes'));
         const clientes = await response.json();
 
         container.innerHTML = `
@@ -159,7 +159,7 @@ async function cargarReservas() {
     const container = document.getElementById('reservasContainer');
 
     try {
-        const response = await fetch('/api/reservas');
+        const response = await fetch(getApiUrl('/reservas'));
         const reservas = await response.json();
 
         container.innerHTML = `
@@ -198,7 +198,7 @@ async function cargarReservas() {
 
 async function actualizarEstadoReserva(id, estado) {
     try {
-        const response = await fetch(`/api/reservas/${id}/estado`, {
+        const response = await fetch(getApiUrl(`/reservas/${id}/estado`), {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ estado })

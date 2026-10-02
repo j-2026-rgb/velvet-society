@@ -16,7 +16,7 @@ async function cargarServiciosSelect() {
     const select = document.getElementById('servicio');
 
     try {
-        const response = await fetch('/api/servicios');
+        const response = await fetch(getApiUrl('/servicios'));
         const servicios = await response.json();
 
         select.innerHTML = '<option value="">Selecciona un servicio</option>' +
@@ -30,7 +30,7 @@ async function cargarReservas() {
     const container = document.getElementById('reservasContainer');
 
     try {
-        const response = await fetch('/api/reservas/mis-reservas');
+        const response = await fetch(getApiUrl('/reservas/mis-reservas'));
 
         if (response.status === 401) {
             container.innerHTML = '<p class="text-center">Debes <a href="/login.html" style="color: var(--dorado);">iniciar sesión</a> para ver tus reservas.</p>';
@@ -84,7 +84,7 @@ async function crearReserva(e) {
     const observaciones = document.getElementById('observaciones').value;
 
     try {
-        const response = await fetch('/api/reservas', {
+        const response = await fetch(getApiUrl('/reservas'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id_servicio, fecha, observaciones })
@@ -108,7 +108,7 @@ async function cancelarReserva(id) {
     if (!confirm('¿Estás seguro de cancelar esta reserva?')) return;
 
     try {
-        const response = await fetch(`/api/reservas/${id}/cancelar`, { method: 'PUT' });
+        const response = await fetch(getApiUrl(`/reservas/${id}/cancelar`), { method: 'PUT' });
 
         if (response.ok) {
             mostrarAlerta('Reserva cancelada', 'success');

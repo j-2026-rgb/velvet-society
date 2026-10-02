@@ -8,7 +8,7 @@ async function cargarServicios() {
     const container = document.getElementById('serviciosContainer');
 
     try {
-        const response = await fetch('/api/servicios');
+        const response = await fetch(getApiUrl('/servicios'));
         const servicios = await response.json();
 
         if (servicios.length === 0) {
