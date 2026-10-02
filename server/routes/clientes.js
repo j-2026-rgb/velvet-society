@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         await getConnection();
-        const clientes = all(`
+        const clientes = await all(`
             SELECT c.id_cliente, u.nombre, u.correo, c.telefono, c.direccion, c.fecha_registro
             FROM clientes c
             JOIN usuarios u ON c.id_usuario = u.id_usuario

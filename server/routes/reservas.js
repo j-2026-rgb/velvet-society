@@ -13,7 +13,7 @@ router.get('/mis-reservas', async (req, res) => {
 
     try {
         await getConnection();
-        const reservas = all(`
+        const reservas = await all(`
             SELECT r.*, s.nombre as nombre_servicio, s.precio
             FROM reservas r
             JOIN servicios s ON r.id_servicio = s.id_servicio
@@ -33,7 +33,7 @@ router.get('/mis-reservas', async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         await getConnection();
-        const reservas = all(`
+        const reservas = await all(`
             SELECT r.*, s.nombre as nombre_servicio, u.nombre as nombre_cliente, u.correo as correo_cliente
             FROM reservas r
             JOIN servicios s ON r.id_servicio = s.id_servicio
@@ -64,21 +64,19 @@ router.post('/', async (req, res) => {
     try {
         await getConnection();
 
-        // Obtener id_cliente del usuario
-        const cliente = get('SELECT id_cliente FROM clientes WHERE id_usuario = ?', [session.id_usuario]);
+        const cliente = await get('SELECT id_cliente FROM clientes WHERE id_usuario = ?', [session.id_usuario]);
         if (!cliente) {
             return res.status(404).json({ error: 'Perfil de cliente no encontrado' });
         }
 
-        run(
+        const result = await run(
             'INSERT INTO reservas (id_cliente, id_servicio, fecha, observaciones) VALUES (?, ?, ?, ?)',
             [cliente.id_cliente, id_servicio, fecha, observaciones || '']
         );
 
-        const result = get('SELECT last_insert_rowid() as id');
         res.status(201).json({
             mensaje: 'Reserva creada exitosamente',
-            id_reserva: result.id
+            id_reserva: result.insertId
         });
     } catch (error) {
         console.error('Error al crear reserva:', error);
@@ -92,7 +90,7 @@ router.put('/:id/estado', async (req, res) => {
 
     try {
         await getConnection();
-        run('UPDATE reservas SET estado = ? WHERE id_reserva = ?', [estado, req.params.id]);
+        await run('UPDATE reservas SET estado = ? WHERE id_reserva = ?', [estado, req.params.id]);
         res.json({ mensaje: 'Estado de reserva actualizado' });
     } catch (error) {
         console.error('Error al actualizar reserva:', error);
@@ -110,7 +108,7 @@ router.put('/:id/cancelar', async (req, res) => {
 
     try {
         await getConnection();
-        run(`
+        await run(`
             UPDATE reservas SET estado = 'cancelada'
             WHERE id_reserva = ? AND id_cliente = (
                 SELECT id_cliente FROM clientes WHERE id_usuario = ?

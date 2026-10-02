@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         await getConnection();
-        const usuarios = all(`
+        const usuarios = await all(`
             SELECT u.id_usuario, u.nombre, u.correo, u.fecha_creacion, r.nombre as rol
             FROM usuarios u
             JOIN roles r ON u.id_rol = r.id_rol
@@ -30,7 +30,7 @@ router.get('/perfil', async (req, res) => {
 
     try {
         await getConnection();
-        const usuario = get(`
+        const usuario = await get(`
             SELECT u.id_usuario, u.nombre, u.correo, u.fecha_creacion, r.nombre as rol,
                    c.telefono, c.direccion
             FROM usuarios u

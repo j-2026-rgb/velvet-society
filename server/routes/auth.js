@@ -15,27 +15,21 @@ router.post('/registro', async (req, res) => {
     try {
         await getConnection();
 
-        // Verificar si el correo ya existe
-        const existingUser = get('SELECT id_usuario FROM usuarios WHERE correo = ?', [correo]);
+        const existingUser = await get('SELECT id_usuario FROM usuarios WHERE correo = ?', [correo]);
         if (existingUser) {
             return res.status(409).json({ error: 'El correo ya está registrado' });
         }
 
-        // Hash de contraseña
         const hashedPassword = bcrypt.hashSync(contraseña, 10);
 
-        // Insertar usuario con rol cliente (id_rol = 2)
-        run(
+        const result = await run(
             'INSERT INTO usuarios (nombre, correo, contraseña, id_rol) VALUES (?, ?, ?, 2)',
             [nombre, correo, hashedPassword]
         );
 
-        // Obtener el ID del usuario insertado
-        const usuario = get('SELECT last_insert_rowid() as id');
-        const idUsuario = usuario.id;
+        const idUsuario = result.insertId;
 
-        // Insertar en tabla clientes
-        run(
+        await run(
             'INSERT INTO clientes (id_usuario, telefono, direccion) VALUES (?, ?, ?)',
             [idUsuario, telefono || null, direccion || null]
         );
@@ -61,7 +55,7 @@ router.post('/login', async (req, res) => {
     try {
         await getConnection();
 
-        const usuario = get(`
+        const usuario = await get(`
             SELECT u.id_usuario, u.nombre, u.correo, u.contraseña, u.id_rol, r.nombre as rol
             FROM usuarios u
             JOIN roles r ON u.id_rol = r.id_rol
@@ -77,7 +71,6 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Credenciales incorrectas' });
         }
 
-        // Crear sesión con cookie
         res.cookie('session', JSON.stringify({
             id_usuario: usuario.id_usuario,
             nombre: usuario.nombre,
@@ -85,7 +78,7 @@ router.post('/login', async (req, res) => {
             rol: usuario.rol
         }), {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000 // 24 horas
+            maxAge: 24 * 60 * 60 * 1000
         });
 
         res.json({

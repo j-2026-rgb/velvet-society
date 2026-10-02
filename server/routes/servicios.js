@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         await getConnection();
-        const servicios = all("SELECT * FROM servicios WHERE estado = 'activo' ORDER BY nombre");
+        const servicios = await all("SELECT * FROM servicios WHERE estado = 'activo' ORDER BY nombre");
         res.json(servicios);
     } catch (error) {
         console.error('Error al obtener servicios:', error);
@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
 router.get('/todos', async (req, res) => {
     try {
         await getConnection();
-        const servicios = all('SELECT * FROM servicios ORDER BY nombre');
+        const servicios = await all('SELECT * FROM servicios ORDER BY nombre');
         res.json(servicios);
     } catch (error) {
         console.error('Error al obtener servicios:', error);
@@ -31,7 +31,7 @@ router.get('/todos', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         await getConnection();
-        const servicio = get('SELECT * FROM servicios WHERE id_servicio = ?', [req.params.id]);
+        const servicio = await get('SELECT * FROM servicios WHERE id_servicio = ?', [req.params.id]);
         if (!servicio) {
             return res.status(404).json({ error: 'Servicio no encontrado' });
         }
@@ -52,15 +52,14 @@ router.post('/', async (req, res) => {
 
     try {
         await getConnection();
-        run(
+        const result = await run(
             'INSERT INTO servicios (nombre, descripcion, precio) VALUES (?, ?, ?)',
             [nombre, descripcion || '', precio]
         );
 
-        const result = get('SELECT last_insert_rowid() as id');
         res.status(201).json({
             mensaje: 'Servicio creado exitosamente',
-            id_servicio: result.id
+            id_servicio: result.insertId
         });
     } catch (error) {
         console.error('Error al crear servicio:', error);
@@ -74,7 +73,7 @@ router.put('/:id', async (req, res) => {
 
     try {
         await getConnection();
-        run(
+        await run(
             'UPDATE servicios SET nombre = ?, descripcion = ?, precio = ?, estado = ? WHERE id_servicio = ?',
             [nombre, descripcion, precio, estado, req.params.id]
         );
@@ -90,7 +89,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         await getConnection();
-        run("UPDATE servicios SET estado = 'inactivo' WHERE id_servicio = ?", [req.params.id]);
+        await run("UPDATE servicios SET estado = 'inactivo' WHERE id_servicio = ?", [req.params.id]);
         res.json({ mensaje: 'Servicio desactivado exitosamente' });
     } catch (error) {
         console.error('Error al desactivar servicio:', error);

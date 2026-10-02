@@ -1,94 +1,110 @@
-const initSqlJs = require('sql.js');
-const path = require('path');
-const fs = require('fs');
+const mysql = require('mysql2/promise');
 
-const DB_PATH = path.join(__dirname, '..', '..', 'database', 'velvet_society.db');
-const SCHEMA_PATH = path.join(__dirname, '..', '..', 'database', 'schema.sql');
+const DB_CONFIG = {
+    host: process.env.MYSQL_ADDON_HOST || 'bhzuivhmzxxggtz1irtg-mysql.services.clever-cloud.com',
+    database: process.env.MYSQL_ADDON_DB || 'bhzuivhmzxxggtz1irtg',
+    user: process.env.MYSQL_ADDON_USER || 'ul00gwe2wsqqoend',
+    port: parseInt(process.env.MYSQL_ADDON_PORT) || 3306,
+    password: process.env.MYSQL_ADDON_PASSWORD || 'tRLMfMu35KYGXAhfOzVY',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+};
 
-let db = null;
+let pool = null;
 
 async function getConnection() {
-    if (!db) {
-        const SQL = await initSqlJs();
-
-        if (fs.existsSync(DB_PATH)) {
-            const fileBuffer = fs.readFileSync(DB_PATH);
-            db = new SQL.Database(fileBuffer);
-        } else {
-            db = new SQL.Database();
-        }
-
-        db.run('PRAGMA foreign_keys = ON;');
+    if (!pool) {
+        pool = mysql.createPool(DB_CONFIG);
     }
-    return db;
+    return pool;
 }
 
 async function initializeDatabase() {
     const connection = await getConnection();
-    const schema = fs.readFileSync(SCHEMA_PATH, 'utf8');
-    connection.exec(schema);
-    saveDatabase();
-    console.log('  Base de datos inicializada correctamente\n');
+    const schema = `
+        CREATE TABLE IF NOT EXISTS roles (
+            id_rol INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(50) NOT NULL UNIQUE
+        );
+
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(100) NOT NULL,
+            correo VARCHAR(100) NOT NULL UNIQUE,
+            contraseña VARCHAR(255) NOT NULL,
+            id_rol INT NOT NULL,
+            fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (id_rol) REFERENCES roles(id_rol)
+        );
+
+        CREATE TABLE IF NOT EXISTS clientes (
+            id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+            id_usuario INT NOT NULL UNIQUE,
+            telefono VARCHAR(20),
+            direccion VARCHAR(255),
+            fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+        );
+
+        CREATE TABLE IF NOT EXISTS servicios (
+            id_servicio INT AUTO_INCREMENT PRIMARY KEY,
+            nombre VARCHAR(100) NOT NULL,
+            descripcion TEXT,
+            precio DECIMAL(10,2) NOT NULL,
+            estado ENUM('activo', 'inactivo') NOT NULL DEFAULT 'activo',
+            fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS reservas (
+            id_reserva INT AUTO_INCREMENT PRIMARY KEY,
+            id_cliente INT NOT NULL,
+            id_servicio INT NOT NULL,
+            fecha DATE NOT NULL,
+            estado ENUM('pendiente', 'confirmada', 'cancelada', 'completada') NOT NULL DEFAULT 'pendiente',
+            observaciones TEXT,
+            fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente) ON DELETE CASCADE,
+            FOREIGN KEY (id_servicio) REFERENCES servicios(id_servicio)
+        );
+
+        CREATE TABLE IF NOT EXISTS pagos (
+            id_pago INT AUTO_INCREMENT PRIMARY KEY,
+            id_reserva INT NOT NULL,
+            fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            valor DECIMAL(10,2) NOT NULL,
+            metodo VARCHAR(50) NOT NULL,
+            estado ENUM('pendiente', 'completado', 'fallido', 'reembolsado') NOT NULL DEFAULT 'pendiente',
+            FOREIGN KEY (id_reserva) REFERENCES reservas(id_reserva) ON DELETE CASCADE
+        );
+
+        INSERT IGNORE INTO roles (id_rol, nombre) VALUES (1, 'administrador');
+        INSERT IGNORE INTO roles (id_rol, nombre) VALUES (2, 'cliente');
+
+        INSERT IGNORE INTO usuarios (id_usuario, nombre, correo, contraseña, id_rol)
+        VALUES (1, 'Administrador', 'admin@velvetsociety.com', '$2a$10$Khd3S6RTh1iWmb9p7N1AZ.b/HBHLaBQ.uxh.hTSIl51qA0wP4gehm', 1);
+    `;
+
+    await connection.query(schema);
+    console.log('  Base de datos MySQL inicializada correctamente\n');
 }
 
-function saveDatabase() {
-    if (db) {
-        const data = db.export();
-        const buffer = Buffer.from(data);
-        fs.writeFileSync(DB_PATH, buffer);
-    }
-}
-
-function run(sql, params = []) {
-    if (params.length > 0) {
-        const stmt = db.prepare(sql);
-        stmt.run(params);
-        stmt.free();
-    } else {
-        db.run(sql);
-    }
-    saveDatabase();
-    const result = db.exec('SELECT last_insert_rowid() as id');
-    return { changes: db.getRowsModified(), lastInsertRowid: result[0]?.values[0]?.[0] };
-}
-
-function get(sql, params = []) {
-    const stmt = db.prepare(sql);
-    stmt.bind(params);
-    let row = undefined;
-    if (stmt.step()) {
-        const columns = stmt.getColumnNames();
-        const values = stmt.get();
-        row = {};
-        columns.forEach((col, i) => {
-            row[col] = values[i];
-        });
-    }
-    stmt.free();
-    return row;
-}
-
-function all(sql, params = []) {
-    const stmt = db.prepare(sql);
-    stmt.bind(params);
-    const rows = [];
-    const columns = stmt.getColumnNames();
-    while (stmt.step()) {
-        const values = stmt.get();
-        const row = {};
-        columns.forEach((col, i) => {
-            row[col] = values[i];
-        });
-        rows.push(row);
-    }
-    stmt.free();
-    return rows;
-}
-
-function exec(sql) {
-    const result = db.exec(sql);
-    saveDatabase();
+async function run(sql, params = []) {
+    const connection = await getConnection();
+    const [result] = await connection.execute(sql, params);
     return result;
 }
 
-module.exports = { getConnection, initializeDatabase, run, get, all, exec };
+async function get(sql, params = []) {
+    const connection = await getConnection();
+    const [rows] = await connection.execute(sql, params);
+    return rows[0];
+}
+
+async function all(sql, params = []) {
+    const connection = await getConnection();
+    const [rows] = await connection.execute(sql, params);
+    return rows;
+}
+
+module.exports = { getConnection, initializeDatabase, run, get, all };

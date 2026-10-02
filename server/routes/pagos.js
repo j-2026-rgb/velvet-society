@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/reserva/:id', async (req, res) => {
     try {
         await getConnection();
-        const pagos = all(
+        const pagos = await all(
             'SELECT * FROM pagos WHERE id_reserva = ? ORDER BY fecha DESC',
             [req.params.id]
         );
@@ -28,15 +28,14 @@ router.post('/', async (req, res) => {
 
     try {
         await getConnection();
-        run(
+        const result = await run(
             'INSERT INTO pagos (id_reserva, valor, metodo) VALUES (?, ?, ?)',
             [id_reserva, valor, metodo]
         );
 
-        const result = get('SELECT last_insert_rowid() as id');
         res.status(201).json({
             mensaje: 'Pago registrado exitosamente',
-            id_pago: result.id
+            id_pago: result.insertId
         });
     } catch (error) {
         console.error('Error al registrar pago:', error);
